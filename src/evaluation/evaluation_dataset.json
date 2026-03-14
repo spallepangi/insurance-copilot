@@ -1,0 +1,42 @@
+[
+  {
+    "query": "Does the Bronze plan cover emergency room visits?",
+    "expected_section": "Emergency Services",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the deductible for the Gold plan?",
+    "expected_section": "Deductible",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Compare prescription drug coverage between Silver and Platinum.",
+    "expected_section": "Prescription",
+    "expected_plans": ["Silver", "Platinum"]
+  },
+  {
+    "query": "Which plan has the lowest out-of-pocket maximum?",
+    "expected_section": "Out-of-Pocket",
+    "expected_plan": null
+  },
+  {
+    "query": "What is the copay for primary care in the Silver plan?",
+    "expected_section": "Primary Care",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "Does the Platinum plan cover specialist visits?",
+    "expected_section": "Specialist",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What are the eligibility criteria for the Bronze plan?",
+    "expected_section": "Eligibility",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What exclusions apply to the Gold plan?",
+    "expected_section": "Exclusions",
+    "expected_plan": "Gold"
+  }
+]
