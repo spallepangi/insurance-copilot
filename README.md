@@ -1,6 +1,12 @@
 # InsuranceCopilot AI
 
-Production-grade multimodal RAG system for healthcare insurance policy documents. It supports semantic retrieval, policy reasoning, cross-plan comparison, source citations, and observability (latency, cost, evaluation).
+Production-grade RAG system for healthcare insurance policy documents. It supports semantic retrieval, policy reasoning, cross-plan comparison, source citations, and observability (latency, cost, evaluation).
+
+## Why this project / Problem we're solving
+
+**Problem:** Understanding health insurance plans is hard. Policy PDFs are long, dense, and full of jargon. People need quick, accurate answers to questions like “What’s my emergency room copay?” or “How does prescription coverage differ between Silver and Gold?” without reading dozens of pages.
+
+**Why we built this:** We built InsuranceCopilot AI so users can ask natural-language questions and get answers grounded in their actual policy text, with clear citations (plan, section, page). The system improves retrieval quality (recall and precision) via smaller chunks, hybrid vector + keyword search, weighted scoring, and reranking—so the right excerpts reach the LLM and answers stay accurate and trustworthy.
 
 ## Overview
 
@@ -16,7 +22,7 @@ InsuranceCopilot AI reads insurance policy PDFs (e.g. Bronze, Silver, Gold, Plat
 │       ↓                                                                  │
 │  Qdrant (vectors + metadata: plan, section, page)                        │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  User Query  →  Embed  →  Hybrid Search (vector + keyword)  →  Top 10   │
+│  User Query  →  Embed  →  Hybrid (vector 20 + BM25 20)  →  Merge 40   │
 │       ↓                                                                  │
 │  Rerank (bge-reranker-large)  →  Top 5  →  LLM  →  Answer + Citations   │
 ├─────────────────────────────────────────────────────────────────────────┤
@@ -96,7 +102,7 @@ insurance-copilot/
    python -m scripts.ingest_documents
    ```
 
-   This parses PDFs with Docling, chunks by section (800 tokens, 150 overlap), embeds with BGE, and upserts into Qdrant.
+   This parses PDFs with Docling, chunks by section (450 tokens, 120 overlap), embeds with BGE, upserts into Qdrant, and builds the BM25 index for hybrid retrieval.
 
 2. **Run the pipeline**
 
@@ -139,6 +145,6 @@ insurance-copilot/
 ## Future Improvements
 
 - Full LangSmith tracing for retrieval and generation.
-- Sparse (e.g. BM25) in Qdrant for true hybrid search.
+- Sparse BM25 is already used (see `src/retrieval/bm25_index.py`).
 - Evaluation with answer correctness (e.g. LLM-as-judge).
 - Caching for repeated queries and embedding reuse.
