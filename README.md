@@ -4,14 +4,13 @@ Production-grade RAG system for healthcare insurance policy documents. It suppor
 
 ---
 
-## For recruiters & interviewers
+## What it does
 
-This repo is a **portfolio demo** for technical interviews. It implements a full RAG pipeline: PDF ingestion → hybrid retrieval (vector + BM25) → reranking → LLM answers with citations, plus evaluation (recall/precision and optional RAGAS), FastAPI, Streamlit UI, tests, and CI.
+InsuranceCopilot AI is a full RAG pipeline: PDF ingestion → hybrid retrieval (vector + BM25) → reranking → LLM answers with citations. It includes a 100-question evaluation (recall@5, precision@5, optional RAGAS), FastAPI, Streamlit UI, tests, and CI.
 
-- **Quick demo:** If the project is already set up, run **`python -m scripts.run_pipeline ui`** for the Streamlit UI, or **`python -m src.evaluation.evaluation_runner --limit=5`** for a short evaluation. Run **`pytest tests/ -v`** to see tests.
-- **Full guide:** See **[docs/DEMO.md](docs/DEMO.md)** for a 5‑minute demo script, tech stack, talking points, and where to look in the codebase.
+**Quick start** (once set up): run **`python -m scripts.run_pipeline ui`** for the Streamlit UI, **`python -m src.evaluation.evaluation_runner --limit=5`** for a short evaluation, or **`pytest tests/ -v`** for tests. See **[docs/DEMO.md](docs/DEMO.md)** for a short run-through and code map.
 
-**Highlights:** Docling PDF parsing · Section-aware chunking (450/120 tokens) · BGE embeddings + Qdrant · Hybrid search (vector top 20 + BM25 top 20 → merge 40) · bge-reranker-large → top 5 · OpenAI answer generation with plan/section/page citations · 100-question evaluation (recall@5, precision@5) · Optional RAGAS (faithfulness, answer relevancy) · FastAPI + Streamlit · pytest + GitHub Actions · Dockerfile · Optional API auth, rate limiting, health checks.
+**Components:** Docling PDF parsing · Section-aware chunking (450/120 tokens) · BGE embeddings + Qdrant · Hybrid search (vector top 20 + BM25 top 20 → merge 40) · bge-reranker-large → top 5 · OpenAI answer generation with plan/section/page citations · Optional API auth, rate limiting, health checks.
 
 ---
 
@@ -168,7 +167,7 @@ This will: create/use `.venv`, install dependencies, ingest documents (parse →
 
 | Document | Purpose |
 |----------|---------|
-| **[docs/DEMO.md](docs/DEMO.md)** | Interview demo & recruiter guide (quick demo, talking points, code map) |
+| **[docs/DEMO.md](docs/DEMO.md)** | Quick start, tech stack, and code map |
 | **[docs/PIPELINE_WORKFLOW.md](docs/PIPELINE_WORKFLOW.md)** | End-to-end pipeline (ingestion, query, evaluation) |
 | **[src/evaluation/README.md](src/evaluation/README.md)** | Evaluation metrics and how to improve retrieval |
 | **[docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md)** | Production checklist, security, testing, deployment |

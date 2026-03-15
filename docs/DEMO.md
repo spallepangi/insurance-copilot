@@ -1,22 +1,22 @@
-# Interview Demo & Recruiter Guide
+# Quick Start & Project Overview
 
-This project is intended as a **portfolio demo** for technical interviews and recruiter review. It showcases a full RAG (Retrieval-Augmented Generation) system built for production-style use: ingestion, hybrid retrieval, reranking, answer generation with citations, evaluation, API, and optional production hardening.
+This document explains what the project does and how to run it quickly.
 
 ---
 
-## What This Project Demonstrates
+## What This Project Does
 
-| Area | What’s Shown |
-|------|----------------|
+| Area | Description |
+|------|--------------|
 | **RAG pipeline** | End-to-end: PDF → parse → chunk → embed → vector + keyword search → rerank → LLM with citations. |
-| **Retrieval quality** | Hybrid (vector + BM25), weighted scoring, reranker, section-aware chunking; evaluated with recall@5 / precision@5. |
-| **Software structure** | Clear modules (ingestion, embeddings, vector_store, retrieval, rag, evaluation, api, monitoring), config-driven, testable. |
+| **Retrieval** | Hybrid (vector + BM25), weighted scoring, reranker, section-aware chunking; evaluated with recall@5 / precision@5. |
+| **Structure** | Modules: ingestion, embeddings, vector_store, retrieval, rag, evaluation, api, monitoring; config-driven, testable. |
 | **Evaluation** | 100-question eval set, retrieval metrics, optional RAGAS (faithfulness, answer relevancy). |
-| **Production awareness** | Optional API auth, rate limiting, health checks, retries, timeouts, logging, tests, CI, Docker. |
+| **Production** | Optional API auth, rate limiting, health checks, retries, timeouts, logging, tests, CI, Docker. |
 
 ---
 
-## Quick Demo (5–10 minutes)
+## Quick Start (5–10 minutes)
 
 **Prerequisites:** `.env` with `OPENAI_API_KEY`, `QDRANT_URL` (and `QDRANT_API_KEY` if using Qdrant Cloud), `HUGGINGFACE_TOKEN`. PDFs in `data/` (e.g. `bronze.pdf`, `silver.pdf`).
 
@@ -24,18 +24,18 @@ This project is intended as a **portfolio demo** for technical interviews and re
    ```bash
    .venv/bin/python -m scripts.run_pipeline ui
    ```
-   Ask: *“What is the deductible for the Gold plan?”* or *“Compare prescription coverage between Silver and Platinum.”*
+   Try: *"What is the deductible for the Gold plan?"* or *"Compare prescription coverage between Silver and Platinum."*
 
-2. **Run a quick evaluation** (shows metrics without long run):
+2. **Run a quick evaluation**:
    ```bash
    .venv/bin/python -m src.evaluation.evaluation_runner --limit=5
    ```
-   Then with RAG + RAGAS (if installed):
+   With RAG + RAGAS (if installed):
    ```bash
    .venv/bin/python -m src.evaluation.evaluation_runner --rag --ragas --limit=3
    ```
 
-3. **Run tests** (shows quality bar):
+3. **Run tests**:
    ```bash
    .venv/bin/pytest tests/ -v
    ```
@@ -48,7 +48,7 @@ This project is intended as a **portfolio demo** for technical interviews and re
 
 ---
 
-## Tech Stack (for interviews)
+## Tech Stack
 
 - **Language:** Python 3.10+
 - **Document parsing:** Docling
@@ -65,14 +65,13 @@ This project is intended as a **portfolio demo** for technical interviews and re
 
 ---
 
-## Talking Points for Interviews
+## Design Choices
 
-- **Why RAG:** Policy PDFs are long and jargon-heavy; RAG keeps answers grounded in actual text and citable (plan, section, page).
-- **Why hybrid retrieval:** Vector search captures semantics; BM25 captures exact terms (e.g. “deductible”, “copay”). Combining both improved recall in evaluation.
-- **Why rerank:** A cross-encoder (bge-reranker) on a small candidate set (e.g. 40) gives better precision than using only embedding similarity for the final top-5.
-- **Why section chunking:** Chunking by section (450 tokens, 120 overlap) keeps context coherent and improves section-level retrieval.
+- **RAG:** Policy PDFs are long and jargon-heavy; RAG keeps answers grounded in actual text with citations (plan, section, page).
+- **Hybrid retrieval:** Vector search captures semantics; BM25 captures exact terms (e.g. "deductible", "copay"). Combining both improved recall in evaluation.
+- **Rerank:** A cross-encoder (bge-reranker) on a candidate set of 40 gives better precision than using only embedding similarity for the final top-5.
+- **Section chunking:** Chunking by section (450 tokens, 120 overlap) keeps context coherent and improves section-level retrieval.
 - **Evaluation:** 100-question set with expected section/plan; we track retrieval recall@5 and precision@5 and optionally RAGAS for answer quality.
-- **Production mindset:** API key auth, rate limiting, health checks, retries, timeouts, structured logging, tests, CI, Docker—implemented so the project can be discussed in a production context.
 
 ---
 
@@ -91,23 +90,23 @@ This project is intended as a **portfolio demo** for technical interviews and re
 
 ---
 
-## Full Setup (if demo from scratch)
+## Full Setup (from scratch)
 
 1. Clone repo, create venv, install: `pip install -r requirements.txt`
 2. Copy `.env.example` to `.env`; set `OPENAI_API_KEY`, `QDRANT_URL`, `QDRANT_API_KEY` (if cloud), `HUGGINGFACE_TOKEN`
 3. Add PDFs to `data/` (e.g. `bronze.pdf`, `silver.pdf`, `gold.pdf`, `platinum.pdf`)
 4. Run Qdrant (e.g. `docker run -p 6333:6333 qdrant/qdrant`) or use Qdrant Cloud
 5. Ingest: `python -m scripts.ingest_documents` (15–20 min for 4 PDFs)
-6. Demo: `python -m scripts.run_pipeline ui` and/or evaluation/tests as above
+6. Run: `python -m scripts.run_pipeline ui` and/or evaluation/tests as above
 
-For a single script that does venv + install + ingest + quick eval: `bash scripts/setup_and_run.sh` (requires `.env` and PDFs in place).
+Or use the setup script: `bash scripts/setup_and_run.sh` (requires `.env` and PDFs in place).
 
 ---
 
-## Document Index
+## Documentation
 
 - **README.md** — Project overview, setup, usage, metrics
-- **docs/DEMO.md** — This file: interview demo and recruiter guide
+- **docs/DEMO.md** — This file: quick start and code map
 - **docs/PIPELINE_WORKFLOW.md** — End-to-end pipeline (ingestion, query, evaluation)
 - **src/evaluation/README.md** — Evaluation metrics and how to improve retrieval
 - **docs/PRODUCTION_READINESS.md** — Production checklist

@@ -1,6 +1,6 @@
 # Pipeline Workflow & In-Depth Explanation
 
-This document describes the end-to-end workflow of InsuranceCopilot AI: from PDF ingestion to answering user questions, plus evaluation and deployment. **For interview demos and recruiter review,** see **[DEMO.md](DEMO.md)** first.
+This document describes the end-to-end workflow of InsuranceCopilot AI: from PDF ingestion to answering user questions, plus evaluation and deployment.
 
 ---
 
