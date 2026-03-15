@@ -58,77 +58,64 @@ Yes, for the intended scope:
 
 ---
 
-## What’s remaining for enterprise production (and free-tier options)
-
-Everything below can be implemented in code or with free-tier services unless noted. **Free** = $0 and implementable now with open-source or free-tier offerings.
-
+## What’s remaining for enterprise production 
 ### Security
 
-| Item | Free tier? | How |
-|------|------------|-----|
-| **API authentication** (API key or OAuth) | ✅ Free | Code: validate `X-API-Key` or `Authorization` header against a secret from env. No external service required. |
-| **OAuth / SSO** (optional) | ✅ Free tier | Auth0, Clerk, or Keycloak (self-hosted) have free tiers for limited MAU. |
-| **Rate limiting** | ✅ Free | Code: e.g. `slowapi` (pip) or in-memory/Redis per-IP or per-key limits. |
-| **Input validation & sanitization** | ✅ Free | You already use Pydantic; add max length on `question`, strip/escape if you render user input in UI. |
-| **Secrets in env / vault** | ✅ Free | Keep using `.env`; for “vault” you can use GitHub Actions secrets or free tier of Doppler/HashiCorp Vault (limits apply). |
+| Item | How |
+|------|-----|
+| **API authentication** (API key or OAuth) | Code: validate `X-API-Key` or `Authorization` header against a secret from env. No external service required. |
+| **OAuth / SSO** (optional) | Auth0, Clerk, or Keycloak (self-hosted). |
+| **Rate limiting** | Code: e.g. `slowapi` (pip) or in-memory/Redis per-IP or per-key limits. |
+| **Input validation & sanitization** | You already use Pydantic; add max length on `question`, strip/escape if you render user input in UI. |
+| **Secrets in env / vault** | Keep using `.env`; for “vault” you can use GitHub Actions secrets or a secrets manager (e.g. Doppler, HashiCorp Vault). |
 
 ### Reliability
 
-| Item | Free tier? | How |
-|------|------------|-----|
-| **Retries with backoff** (Qdrant, embedder, LLM) | ✅ Free | Code: `tenacity` or a small retry loop with exponential backoff. |
-| **Timeouts** (all outbound calls) | ✅ Free | Code: set `timeout` on Qdrant client, HTTP calls, and LLM client. |
-| **Health check endpoint** | ✅ Free | Code: e.g. `GET /health` that pings Qdrant (and optionally embedder); return 503 if unhealthy. |
-| **Circuit breaker** (optional) | ✅ Free | Code: e.g. `pybreaker` or simple “fail after N errors, then skip for T seconds”. |
-| **Graceful shutdown** | ✅ Free | Code: FastAPI lifespan or signal handler to drain in-flight requests before exit. |
+| Item | How |
+|------|-----|
+| **Retries with backoff** (Qdrant, embedder, LLM) | Code: `tenacity` or a small retry loop with exponential backoff. |
+| **Timeouts** (all outbound calls) | Code: set `timeout` on Qdrant client, HTTP calls, and LLM client. |
+| **Health check endpoint** | Code: e.g. `GET /health` that pings Qdrant (and optionally embedder); return 503 if unhealthy. |
+| **Circuit breaker** (optional) | Code: e.g. `pybreaker` or simple “fail after N errors, then skip for T seconds”. |
+| **Graceful shutdown** | Code: FastAPI lifespan or signal handler to drain in-flight requests before exit. |
 
 ### Observability
 
-| Item | Free tier? | How |
-|------|------------|-----|
-| **Structured logging** (JSON, levels) | ✅ Free | Code: use `structlog` or ensure log lines are JSON with a consistent schema. |
-| **Tracing** (OpenTelemetry) | ✅ Free | Code: `opentelemetry-api` + instrument FastAPI and HTTP/DB; export to Jaeger (self-hosted or free tier) or Zipkin. |
-| **Alerting** (e.g. latency spike, errors) | ✅ Free tier | Free: webhook to Slack/Discord/email; or Uptime Kuma (self-hosted). Paid: PagerDuty/Opsgenie free tiers (limits). |
-| **Dashboards** (latency, error rate, cost) | ✅ Free tier | Grafana Cloud free tier, or self-hosted Grafana + SQLite/JSONL (or export metrics to Prometheus). |
+| Item | How |
+|------|-----|
+| **Structured logging** (JSON, levels) | Code: use `structlog` or ensure log lines are JSON with a consistent schema. |
+| **Tracing** (OpenTelemetry) | Code: `opentelemetry-api` + instrument FastAPI and HTTP/DB; export to Jaeger or Zipkin. |
+| **Alerting** (e.g. latency spike, errors) | Webhook to Slack/Discord/email; or Uptime Kuma (self-hosted); or PagerDuty/Opsgenie. |
+| **Dashboards** (latency, error rate, cost) | Grafana (Cloud or self-hosted) + SQLite/JSONL, or export metrics to Prometheus. |
 
 ### Testing & CI
 
-| Item | Free tier? | How |
-|------|------------|-----|
-| **Unit tests** (pytest) | ✅ Free | Code: pytest; mock embedder/Qdrant/LLM; run locally and in CI. |
-| **Integration tests** (one full query path) | ✅ Free | Code: pytest with real .env or test containers; optional `testcontainers` (Docker). |
-| **CI** (run tests + lint on push/PR) | ✅ Free | GitHub Actions: 2,000 min/month free for private repos; run pytest and `evaluation_runner --limit=5` (or full eval on schedule). |
-| **Evaluation in CI** | ✅ Free | Same as above; full 100-query run is slow (~20 min) so use `--limit=5` or `--limit=10` on PR and full run on main/nightly. |
+| Item | How |
+|------|-----|
+| **Unit tests** (pytest) | Code: pytest; mock embedder/Qdrant/LLM; run locally and in CI. |
+| **Integration tests** (one full query path) | Code: pytest with real .env or test containers; optional `testcontainers` (Docker). |
+| **CI** (run tests + lint on push/PR) | GitHub Actions: run pytest and `evaluation_runner --limit=5` (or full eval on schedule). |
+| **Evaluation in CI** | Full 100-query run is slow (~20 min); use `--limit=5` or `--limit=10` on PR and full run on main/nightly. |
 
 ### Deployment & scaling
 
-| Item | Free tier? | How |
-|------|------------|-----|
-| **Dockerfile** (API + UI) | ✅ Free | Code: multi-stage Dockerfile; no cost. |
-| **Container registry** | ✅ Free | GitHub Container Registry (GHCR) or Docker Hub free tier. |
-| **Hosting** (run the app) | ✅ Free tier | Railway, Render, Fly.io, Hugging Face Spaces (Streamlit) have free tiers; limits on RAM/hours. Your Qdrant/OpenAI/HF usage is separate. |
-| **Secrets in production** | ✅ Free | Env vars on the host or in the platform (Railway/Render/Fly.io all support env secrets for free). |
-| **Horizontal scaling** (multiple API replicas) | ⚠️ Depends | Free tiers usually allow 1 instance; scaling out = paid or self-hosted (e.g. Docker Compose or K8s on your own machine). |
-| **Caching** (e.g. repeated queries) | ✅ Free tier | In-memory dict; or Redis via Upstash Redis free tier / Redis Cloud free tier. |
+| Item | How |
+|------|-----|
+| **Dockerfile** (API + UI) | Code: multi-stage Dockerfile. |
+| **Container registry** | GitHub Container Registry (GHCR) or Docker Hub. |
+| **Hosting** (run the app) | Railway, Render, Fly.io, Hugging Face Spaces (Streamlit), or self-hosted. |
+| **Secrets in production** | Env vars on the host or in the platform (Railway/Render/Fly.io support env secrets). |
+| **Horizontal scaling** (multiple API replicas) | Multiple instances; Docker Compose or Kubernetes. |
+| **Caching** (e.g. repeated queries) | In-memory dict; or Redis (e.g. Upstash, Redis Cloud). |
 
-### What usually isn’t free (or is limited)
+### Cost / limits to consider
 
 | Item | Note |
 |------|------|
-| **Qdrant** | You’re already on cloud; they have a free tier with size limits. |
-| **OpenAI** | Pay-per-token; no “free production” tier for high volume. |
-| **Embedding/reranker** | Self-hosted (BGE) = free compute; API-based = paid. |
-| **24/7 uptime SLA** | Free hosting tiers typically don’t guarantee SLA; enterprise = paid. |
+| **Qdrant** | Cloud or self-hosted; size/throughput limits apply. |
+| **OpenAI** | Pay-per-token. |
+| **Embedding/reranker** | Self-hosted (BGE) = your compute; API-based = paid. |
+| **24/7 uptime SLA** | Typically requires paid hosting. |
 | **Dedicated support** | Enterprise support = paid. |
 
 ---
-
-## How much can you implement on free tier now?
-
-Rough split:
-
-- **Fully free (code + free-tier tools):** Most of **security** (API key auth, rate limiting, validation), **reliability** (retries, timeouts, health check, graceful shutdown), **observability** (structured logs, optional tracing, webhook alerts, Grafana free tier), **testing** (pytest, CI with GitHub Actions), and **deployment** (Dockerfile, GHCR, one app on Railway/Render/Fly.io/HF Spaces). That’s the majority of “enterprise-style” hardening.
-- **Free tier with limits:** Hosting (one instance, sleep after idle), Redis (small storage), OAuth (limited MAU), alerting (limited incidents). Enough for a serious MVP or internal tool.
-- **Paid or self-hosted when you need more:** Multiple regions, many replicas, 24/7 SLA, large Qdrant/OpenAI usage, dedicated support.
-
-**Practical order to implement on free tier:** (1) API key auth + rate limiting, (2) health check + retries/timeouts, (3) Dockerfile + deploy to Railway or Render, (4) pytest + GitHub Actions CI, (5) structured logging + optional tracing/alerting.

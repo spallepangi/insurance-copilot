@@ -212,7 +212,7 @@ We improved from an earlier baseline (recall@5 ≈ 0.125, precision@5 ≈ 0.025)
 - Evaluation with answer correctness (e.g. LLM-as-judge).
 - Caching for repeated queries and embedding reuse.
 
-For a checklist of **what’s left for enterprise production** and **what you can do on free tier**, see **`docs/PRODUCTION_READINESS.md`** (security, reliability, observability, testing, deployment, and free-tier options).
+For a checklist of **what’s left for enterprise production** see **`docs/PRODUCTION_READINESS.md`** (security, reliability, observability, testing, deployment).
 
 ### Production features (implemented)
 

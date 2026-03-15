@@ -110,4 +110,4 @@ For a single script that does venv + install + ingest + quick eval: `bash script
 - **docs/DEMO.md** — This file: interview demo and recruiter guide
 - **docs/PIPELINE_WORKFLOW.md** — End-to-end pipeline (ingestion, query, evaluation)
 - **src/evaluation/README.md** — Evaluation metrics and how to improve retrieval
-- **docs/PRODUCTION_READINESS.md** — Production checklist and free-tier notes
+- **docs/PRODUCTION_READINESS.md** — Production checklist
