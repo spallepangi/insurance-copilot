@@ -1,0 +1,7 @@
+# Install after requirements.txt for RAGAS-based evaluation (faithfulness, answer_relevancy).
+# Usage: pip install -r requirements.txt && pip install -r requirements-ragas.txt
+# Then run: .venv/bin/python -m src.evaluation.evaluation_runner --rag --ragas
+# Requires OPENAI_API_KEY (RAGAS uses an LLM to score answers).
+
+ragas>=0.2.0
+datasets>=2.14.0

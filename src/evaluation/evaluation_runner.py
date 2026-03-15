@@ -26,15 +26,22 @@ def load_evaluation_dataset(path: Path | None = None) -> List[dict]:
 def run_evaluation(
     dataset_path: Path | None = None,
     run_full_rag: bool = True,
+    limit: int | None = None,
+    use_ragas: bool = False,
 ) -> dict[str, Any]:
     """
     For each item in evaluation_dataset.json:
     - Run retrieval once, then optionally run full RAG (generate answer).
     - Record retrieved chunks, latency, cost.
     Then compute recall@5, precision@5, mean latency, total cost.
+    If use_ragas and run_full_rag, also compute RAGAS metrics (faithfulness, answer_relevancy) when ragas is installed.
+    If limit is set, only run the first limit queries (for quick tests).
     """
     import time
     dataset = load_evaluation_dataset(dataset_path)
+    if limit is not None and limit > 0:
+        dataset = dataset[:limit]
+        logger.info("Running evaluation on first %d queries", len(dataset))
     pipeline = RAGPipeline()
     results: List[dict] = []
     for i, item in enumerate(dataset):
@@ -80,6 +87,15 @@ def run_evaluation(
         results.append({"query": "", "retrieved_chunks": [], "latency_ms": 0, "cost": 0})
     results = results[: len(eval_entries)]
     metrics = compute_evaluation_metrics(results, eval_entries)
+    if use_ragas and run_full_rag:
+        try:
+            from src.evaluation.ragas_metrics import compute_ragas_metrics
+            ragas_scores = compute_ragas_metrics(results)
+            if ragas_scores:
+                metrics.update(ragas_scores)
+                logger.info("RAGAS metrics: %s", ragas_scores)
+        except Exception as e:
+            logger.warning("RAGAS metrics skipped: %s (install with: pip install -r requirements-ragas.txt)", e)
     return {
         "metrics": metrics,
         "results": results,
@@ -90,7 +106,16 @@ def main():
     """Entrypoint for scripts; prints metrics. Do not run automatically."""
     import sys
     run_rag = "--rag" in sys.argv
-    out = run_evaluation(run_full_rag=run_rag)
+    use_ragas = "--ragas" in sys.argv
+    limit = None
+    for arg in sys.argv[1:]:
+        if arg.startswith("--limit="):
+            try:
+                limit = int(arg.split("=", 1)[1])
+            except ValueError:
+                pass
+            break
+    out = run_evaluation(run_full_rag=run_rag, limit=limit, use_ragas=use_ragas)
     print(json.dumps(out["metrics"], indent=2))
 
 

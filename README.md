@@ -59,6 +59,19 @@ insurance-copilot/
 
 ## Installation
 
+**Option A – Run everything from the beginning (recommended)**
+
+From the project root, with `.env` already in place and PDFs in `data/`:
+
+```bash
+cd insurance-copilot
+bash scripts/setup_and_run.sh
+```
+
+This will: create/use `.venv`, install dependencies, ingest documents (parse → chunk → embed → Qdrant + BM25), then run a 5-query evaluation. Ingestion can take 15–20 minutes for 4 PDFs.
+
+**Option B – Manual steps**
+
 1. **Clone / create project and install dependencies**
 
    ```bash
@@ -124,10 +137,12 @@ insurance-copilot/
 4. **Evaluation** (optional)
 
    ```bash
-   python -m src.evaluation.evaluation_runner
+   .venv/bin/python -m src.evaluation.evaluation_runner          # full 100 queries
+   .venv/bin/python -m src.evaluation.evaluation_runner --limit=5  # quick test
+   .venv/bin/python -m src.evaluation.evaluation_runner --rag --ragas  # add RAGAS (faithfulness, answer_relevancy); requires pip install -r requirements-ragas.txt
    ```
 
-   Runs queries from `src/evaluation/evaluation_dataset.json` and reports retrieval recall@5, precision@5, latency, cost.
+   Runs queries from `src/evaluation/evaluation_dataset.json` and reports retrieval recall@5, precision@5, mean latency, cost. With `--ragas` (and RAGAS installed), also reports **ragas_faithfulness** and **ragas_answer_relevancy**. See **Evaluation metrics** below and `src/evaluation/README.md` for current numbers and the process of improving retrieval.
 
 ## Example Queries
 
@@ -142,9 +157,46 @@ insurance-copilot/
 - **Cost:** per-query cost from OpenAI token usage; logged in `MetricsLogger`.
 - **Observability:** every query logged to JSONL and SQLite; optional LangSmith via `LANGCHAIN_API_KEY`.
 
+## Evaluation metrics
+
+All metrics produced by the evaluation runner:
+
+| Metric | When | Description |
+|--------|------|-------------|
+| **retrieval_recall_at_5** | Always | Fraction of queries where ≥1 of top-5 chunks matches expected section/plan. |
+| **retrieval_precision_at_5** | Always | Fraction of top-5 chunks that match expected section/plan. |
+| **mean_latency_ms** | Always | Average latency per query (retrieval; + generation if `--rag`). |
+| **total_cost** | With `--rag` | Sum of LLM cost over evaluated queries. |
+| **num_queries** | Always | Number of queries evaluated. |
+| **ragas_faithfulness** | With `--rag --ragas` | RAGAS: answer grounded in context (0–1). |
+| **ragas_answer_relevancy** | With `--rag --ragas` | RAGAS: answer addresses the question (0–1). |
+
+Latest **100-query** retrieval-only run:
+
+| Metric | Value |
+|--------|--------|
+| retrieval_recall_at_5 | 0.23 |
+| retrieval_precision_at_5 | 0.056 |
+| mean_latency_ms | ~12,000 |
+| total_cost | 0 |
+| num_queries | 100 |
+
+We improved from an earlier baseline (recall@5 ≈ 0.125, precision@5 ≈ 0.025) by smaller chunking (450/120), hybrid vector + BM25 retrieval (top 20+20 → merge 40), weighted scoring (0.7 vector + 0.3 keyword), and reranking 40 → top 5. For the full improvement process and how to push metrics further, see **`src/evaluation/README.md`**. For end-to-end workflow and pipeline details, see **`docs/PIPELINE_WORKFLOW.md`**.
+
 ## Future Improvements
 
 - Full LangSmith tracing for retrieval and generation.
 - Sparse BM25 is already used (see `src/retrieval/bm25_index.py`).
 - Evaluation with answer correctness (e.g. LLM-as-judge).
 - Caching for repeated queries and embedding reuse.
+
+For a checklist of **what’s left for enterprise production** and **what you can do on free tier**, see **`docs/PRODUCTION_READINESS.md`** (security, reliability, observability, testing, deployment, and free-tier options).
+
+### Production features (implemented)
+
+- **Security:** Optional API key auth (`API_KEY` in `.env`; send `X-API-Key` or `Authorization: Bearer <key>`), rate limiting (e.g. `RATE_LIMIT_PER_MINUTE`), request validation (max question length).
+- **Reliability:** Health check (`GET /health` checks Qdrant), retries with backoff for Qdrant search, timeouts for Qdrant and OpenAI, graceful shutdown.
+- **Observability:** Structured request logging (method, path, status, latency), optional Slack/Discord alerting on 5xx (`SLACK_WEBHOOK_URL`, `DISCORD_WEBHOOK_URL`).
+- **Testing:** `pytest tests/` (unit + API tests); see `tests/`.
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`) runs tests on push/PR; optional quick evaluation on main when secrets are set.
+- **Deployment:** `Dockerfile` for the API; `.env.example` lists all optional env vars.

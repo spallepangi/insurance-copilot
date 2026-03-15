@@ -36,3 +36,8 @@ logs/
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb_checkpoints
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/

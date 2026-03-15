@@ -1,8 +1,13 @@
 [
   {
-    "query": "Does the Bronze plan cover emergency room visits?",
-    "expected_section": "Emergency Services",
+    "query": "What is the deductible for the Bronze plan?",
+    "expected_section": "Deductible",
     "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the deductible for the Silver plan?",
+    "expected_section": "Deductible",
+    "expected_plan": "Silver"
   },
   {
     "query": "What is the deductible for the Gold plan?",
@@ -10,9 +15,49 @@
     "expected_plan": "Gold"
   },
   {
-    "query": "Compare prescription drug coverage between Silver and Platinum.",
-    "expected_section": "Prescription",
-    "expected_plans": ["Silver", "Platinum"]
+    "query": "What is the deductible for the Platinum plan?",
+    "expected_section": "Deductible",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Does the Bronze plan cover emergency room visits?",
+    "expected_section": "Emergency",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the emergency room copay for Silver?",
+    "expected_section": "Emergency",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does the Gold plan cover emergency services?",
+    "expected_section": "Emergency",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Is emergency care covered under Platinum?",
+    "expected_section": "Emergency",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What is the out-of-pocket maximum for Bronze?",
+    "expected_section": "Out-of-Pocket",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the out-of-pocket maximum for Silver?",
+    "expected_section": "Out-of-Pocket",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What is the out-of-pocket maximum for the Gold plan?",
+    "expected_section": "Out-of-Pocket",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the out-of-pocket maximum for Platinum?",
+    "expected_section": "Out-of-Pocket",
+    "expected_plan": "Platinum"
   },
   {
     "query": "Which plan has the lowest out-of-pocket maximum?",
@@ -20,23 +65,450 @@
     "expected_plan": null
   },
   {
-    "query": "What is the copay for primary care in the Silver plan?",
-    "expected_section": "Primary Care",
+    "query": "What is the copay for primary care in the Bronze plan?",
+    "expected_section": "Primary",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the primary care physician copay for Silver?",
+    "expected_section": "Primary",
     "expected_plan": "Silver"
   },
   {
-    "query": "Does the Platinum plan cover specialist visits?",
+    "query": "What is the primary care copay for Gold?",
+    "expected_section": "Primary",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the primary care copay for the Platinum plan?",
+    "expected_section": "Primary",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Does the Bronze plan cover specialist visits?",
+    "expected_section": "Specialist",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the specialist copay for Silver?",
+    "expected_section": "Specialist",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does Gold cover specialist visits?",
+    "expected_section": "Specialist",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the specialist visit cost for Platinum?",
     "expected_section": "Specialist",
     "expected_plan": "Platinum"
   },
   {
-    "query": "What are the eligibility criteria for the Bronze plan?",
+    "query": "Does the Bronze plan cover prescription drugs?",
+    "expected_section": "Prescription",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the prescription drug coverage for Silver?",
+    "expected_section": "Prescription",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does the Gold plan handle prescription coverage?",
+    "expected_section": "Prescription",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the prescription copay for Platinum?",
+    "expected_section": "Prescription",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Compare prescription drug coverage between Silver and Platinum.",
+    "expected_section": "Prescription",
+    "expected_plans": [
+      "Silver",
+      "Platinum"
+    ]
+  },
+  {
+    "query": "Compare deductibles across Bronze and Gold plans.",
+    "expected_section": "Deductible",
+    "expected_plans": [
+      "Bronze",
+      "Gold"
+    ]
+  },
+  {
+    "query": "Is preventive care covered under Bronze?",
+    "expected_section": "Preventive",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What preventive services does Silver cover?",
+    "expected_section": "Preventive",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "Does the Gold plan cover annual wellness visits?",
+    "expected_section": "Preventive",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What preventive care is included in Platinum?",
+    "expected_section": "Preventive",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What is the hospital stay cost for Bronze?",
+    "expected_section": "Hospital",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "How does Silver cover inpatient hospital care?",
+    "expected_section": "Hospital",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What is the inpatient hospital coverage for Gold?",
+    "expected_section": "Hospital",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Does Platinum cover hospitalization?",
+    "expected_section": "Hospital",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What is the urgent care copay for Bronze?",
+    "expected_section": "Urgent",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "How does Silver cover urgent care?",
+    "expected_section": "Urgent",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What is the urgent care cost for the Gold plan?",
+    "expected_section": "Urgent",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Is urgent care covered under Platinum?",
+    "expected_section": "Urgent",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Does Bronze cover mental health services?",
+    "expected_section": "Mental",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the mental health coverage for Silver?",
+    "expected_section": "Mental",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does Gold cover behavioral health?",
+    "expected_section": "Mental",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the mental health benefit for Platinum?",
+    "expected_section": "Mental",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Does the Bronze plan cover lab work?",
+    "expected_section": "Lab",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the laboratory services coverage for Silver?",
+    "expected_section": "Lab",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does Gold cover lab tests?",
+    "expected_section": "Lab",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Are lab services covered under Platinum?",
+    "expected_section": "Lab",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What is the imaging or X-ray coverage for Bronze?",
+    "expected_section": "Imaging",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "Does Silver cover X-rays and imaging?",
+    "expected_section": "Imaging",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What is the radiology coverage for the Gold plan?",
+    "expected_section": "Imaging",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "How does Platinum cover diagnostic imaging?",
+    "expected_section": "Imaging",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What are the eligibility requirements for the Bronze plan?",
     "expected_section": "Eligibility",
     "expected_plan": "Bronze"
   },
   {
-    "query": "What exclusions apply to the Gold plan?",
-    "expected_section": "Exclusions",
+    "query": "Who is eligible for the Silver plan?",
+    "expected_section": "Eligibility",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What are the eligibility criteria for Gold?",
+    "expected_section": "Eligibility",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Who can enroll in the Platinum plan?",
+    "expected_section": "Eligibility",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What exclusions apply to the Bronze plan?",
+    "expected_section": "Exclusion",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is excluded from Silver plan coverage?",
+    "expected_section": "Exclusion",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What are the exclusions for the Gold plan?",
+    "expected_section": "Exclusion",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What does the Platinum plan exclude?",
+    "expected_section": "Exclusion",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "How do I appeal a claim denial under Bronze?",
+    "expected_section": "Appeal",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the appeals process for the Silver plan?",
+    "expected_section": "Appeal",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How can I file a grievance for the Gold plan?",
+    "expected_section": "Appeal",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the appeal process for Platinum?",
+    "expected_section": "Appeal",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What does the Bronze plan cover overall?",
+    "expected_section": "Coverage",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the summary of benefits for Silver?",
+    "expected_section": "Summary",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What benefits does the Gold plan include?",
+    "expected_section": "Coverage",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is covered under the Platinum plan?",
+    "expected_section": "Coverage",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Is there a provider network for the Bronze plan?",
+    "expected_section": "Network",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the network for the Silver plan?",
+    "expected_section": "Network",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does the Gold plan network work?",
+    "expected_section": "Network",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What providers are in the Platinum network?",
+    "expected_section": "Network",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What is the coinsurance for Bronze?",
+    "expected_section": "Coinsurance",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the coinsurance for Silver after the deductible?",
+    "expected_section": "Coinsurance",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does coinsurance work for the Gold plan?",
+    "expected_section": "Coinsurance",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the Platinum plan coinsurance?",
+    "expected_section": "Coinsurance",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What is the copay for a generic drug in Bronze?",
+    "expected_section": "Prescription",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the brand-name drug copay for Silver?",
+    "expected_section": "Prescription",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "Does Gold cover specialty drugs?",
+    "expected_section": "Prescription",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the prescription tier structure for Platinum?",
+    "expected_section": "Prescription",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Compare emergency room coverage between Bronze and Silver.",
+    "expected_section": "Emergency",
+    "expected_plans": [
+      "Bronze",
+      "Silver"
+    ]
+  },
+  {
+    "query": "Compare out-of-pocket maximums for Gold and Platinum.",
+    "expected_section": "Out-of-Pocket",
+    "expected_plans": [
+      "Gold",
+      "Platinum"
+    ]
+  },
+  {
+    "query": "Which plan has the lowest deductible?",
+    "expected_section": "Deductible",
+    "expected_plan": null
+  },
+  {
+    "query": "Which plan has the best prescription coverage?",
+    "expected_section": "Prescription",
+    "expected_plan": null
+  },
+  {
+    "query": "What is the maternity coverage for Bronze?",
+    "expected_section": "Maternity",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "Does Silver cover maternity care?",
+    "expected_section": "Maternity",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What maternity benefits does the Gold plan offer?",
+    "expected_section": "Maternity",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Is maternity covered under Platinum?",
+    "expected_section": "Maternity",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Does the Bronze plan cover physical therapy?",
+    "expected_section": "Rehabilitation",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "What is the rehab coverage for Silver?",
+    "expected_section": "Rehabilitation",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "How does Gold cover physical therapy?",
+    "expected_section": "Rehabilitation",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "Does Platinum cover rehabilitation services?",
+    "expected_section": "Rehabilitation",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "What is the emergency deductible for Bronze?",
+    "expected_section": "Emergency",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "Is there a separate deductible for emergency in Silver?",
+    "expected_section": "Emergency",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What is the copay for an office visit in the Gold plan?",
+    "expected_section": "Primary",
+    "expected_plan": "Gold"
+  },
+  {
+    "query": "What is the office visit copay for Platinum?",
+    "expected_section": "Primary",
+    "expected_plan": "Platinum"
+  },
+  {
+    "query": "Does Bronze require a referral to see a specialist?",
+    "expected_section": "Specialist",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "Does Silver require referrals for specialists?",
+    "expected_section": "Specialist",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What is the child wellness visit coverage for Bronze?",
+    "expected_section": "Preventive",
+    "expected_plan": "Bronze"
+  },
+  {
+    "query": "Are immunizations covered under Silver?",
+    "expected_section": "Preventive",
+    "expected_plan": "Silver"
+  },
+  {
+    "query": "What screening tests does Gold cover?",
+    "expected_section": "Preventive",
     "expected_plan": "Gold"
   }
 ]

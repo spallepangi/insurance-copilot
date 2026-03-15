@@ -5,10 +5,26 @@ Evaluation metrics: retrieval recall@k, precision@k, latency, cost per query.
 from typing import Any, List
 
 
+def _plan_matches(
+    chunk: dict,
+    expected_plan: str | None,
+    expected_plans: List[str] | None,
+) -> bool:
+    """True if chunk's plan matches expected_plan or is in expected_plans."""
+    if expected_plans:
+        plan = (chunk.get("plan") or chunk.get("plan_name") or "").lower()
+        return any(p.lower() in plan for p in expected_plans if p)
+    if expected_plan:
+        plan = (chunk.get("plan") or chunk.get("plan_name") or "").lower()
+        return expected_plan.lower() in plan
+    return True
+
+
 def retrieval_recall_at_k(
     retrieved_chunks: List[dict],
     expected_section: str | None,
     expected_plan: str | None = None,
+    expected_plans: List[str] | None = None,
     k: int = 5,
 ) -> float:
     """
@@ -20,13 +36,8 @@ def retrieval_recall_at_k(
     top = retrieved_chunks[:k]
     for c in top:
         section = (c.get("section") or c.get("section_title") or "").lower()
-        if expected_section.lower() in section:
-            if expected_plan:
-                plan = (c.get("plan") or c.get("plan_name") or "").lower()
-                if expected_plan.lower() in plan:
-                    return 1.0
-            else:
-                return 1.0
+        if expected_section.lower() in section and _plan_matches(c, expected_plan, expected_plans):
+            return 1.0
     return 0.0
 
 
@@ -34,6 +45,7 @@ def retrieval_precision_at_k(
     retrieved_chunks: List[dict],
     expected_section: str | None,
     expected_plan: str | None = None,
+    expected_plans: List[str] | None = None,
     k: int = 5,
 ) -> float:
     """
@@ -45,13 +57,8 @@ def retrieval_precision_at_k(
     matches = 0
     for c in top:
         section = (c.get("section") or c.get("section_title") or "").lower()
-        if expected_section.lower() in section:
-            if expected_plan:
-                plan = (c.get("plan") or c.get("plan_name") or "").lower()
-                if expected_plan.lower() in plan:
-                    matches += 1
-            else:
-                matches += 1
+        if expected_section.lower() in section and _plan_matches(c, expected_plan, expected_plans):
+            matches += 1
     return matches / len(top) if top else 0.0
 
 
@@ -73,8 +80,9 @@ def compute_evaluation_metrics(
         chunks = r.get("retrieved_chunks", [])
         exp_sec = d.get("expected_section")
         exp_plan = d.get("expected_plan")
-        recalls.append(retrieval_recall_at_k(chunks, exp_sec, exp_plan, k=5))
-        precisions.append(retrieval_precision_at_k(chunks, exp_sec, exp_plan, k=5))
+        exp_plans = d.get("expected_plans")
+        recalls.append(retrieval_recall_at_k(chunks, exp_sec, exp_plan, exp_plans, k=5))
+        precisions.append(retrieval_precision_at_k(chunks, exp_sec, exp_plan, exp_plans, k=5))
         latencies.append(r.get("latency_ms", 0))
         costs.append(r.get("cost", 0))
     n = len(recalls)

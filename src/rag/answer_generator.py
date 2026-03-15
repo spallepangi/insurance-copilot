@@ -48,10 +48,10 @@ class AnswerGenerator:
 
     def _get_client(self):
         if self._client is None:
-            from src.utils.config import require_openai_key, LLM_MODEL
+            from src.utils.config import HTTP_TIMEOUT_SECONDS, require_openai_key, LLM_MODEL
             import openai
             self._api_key = self._api_key or require_openai_key()
-            self._client = openai.OpenAI(api_key=self._api_key)
+            self._client = openai.OpenAI(api_key=self._api_key, timeout=HTTP_TIMEOUT_SECONDS)
             if not self.model:
                 self.model = LLM_MODEL
         return self._client

@@ -10,6 +10,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
 
 from src.utils.config import (
+    HTTP_TIMEOUT_SECONDS,
     QDRANT_API_KEY,
     QDRANT_COLLECTION_NAME,
     QDRANT_URL,
@@ -18,6 +19,16 @@ from src.utils.config import (
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def _retry_search(func):
+    """Retry Qdrant search up to 3 times with exponential backoff."""
+    from tenacity import retry, stop_after_attempt, wait_exponential
+    return retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=10),
+        reraise=True,
+    )(func)
 
 
 class QdrantStore:
@@ -39,7 +50,7 @@ class QdrantStore:
     @property
     def client(self) -> QdrantClient:
         if self._client is None:
-            kwargs = {"url": self.url}
+            kwargs: dict = {"url": self.url, "timeout": int(HTTP_TIMEOUT_SECONDS)}
             if self.api_key:
                 kwargs["api_key"] = self.api_key
             self._client = QdrantClient(**kwargs)
@@ -117,13 +128,13 @@ class QdrantStore:
         )
         logger.info("Upserted %d points", len(points))
 
-    def search(
+    def _search_impl(
         self,
         vector: list[float],
         limit: int = 10,
         plan_filter: Optional[str] = None,
     ) -> list[dict]:
-        """Vector similarity search with optional plan filter. Uses query_points (Qdrant client API)."""
+        """Internal: one attempt at vector search."""
         if plan_filter:
             self._ensure_plan_index()
         query_filter = None
@@ -151,6 +162,15 @@ class QdrantStore:
             }
             for r in points
         ]
+
+    def search(
+        self,
+        vector: list[float],
+        limit: int = 10,
+        plan_filter: Optional[str] = None,
+    ) -> list[dict]:
+        """Vector similarity search with optional plan filter. Retries up to 3 times on failure."""
+        return _retry_search(lambda: self._search_impl(vector, limit, plan_filter))()
 
     def search_with_filter(
         self,

@@ -73,6 +73,17 @@ CONTEXT_COMPRESSION_SENTENCES = 2
 QDRANT_COLLECTION_NAME = "insurance_policy_chunks"
 VECTOR_SIZE = 1024  # bge-large-en dimension
 
+# --- API (production) ---
+API_KEY: Optional[str] = _get_optional("API_KEY")  # If set, requests must send X-API-Key or Authorization: Bearer <key>
+_rate_limit = _get_optional("RATE_LIMIT_PER_MINUTE")
+RATE_LIMIT_PER_MINUTE: int = int(_rate_limit) if _rate_limit and _rate_limit.isdigit() else 100
+HTTP_TIMEOUT_SECONDS: float = 60.0  # Timeout for Qdrant and outbound HTTP
+# Optional alerting (if set, 5xx and high-latency events can be sent)
+SLACK_WEBHOOK_URL: Optional[str] = _get_optional("SLACK_WEBHOOK_URL")
+DISCORD_WEBHOOK_URL: Optional[str] = _get_optional("DISCORD_WEBHOOK_URL")
+# Query validation
+QUERY_MAX_LENGTH: int = 2000  # Max character length for question field
+
 # --- LLM (OpenAI by default) ---
 LLM_MODEL = _get_optional("LLM_MODEL", "gpt-4o-mini")
 
