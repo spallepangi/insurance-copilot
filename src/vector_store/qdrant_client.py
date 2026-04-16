@@ -54,6 +54,7 @@ class QdrantStore:
             kwargs: dict = {
                 "url": self.url,
                 "timeout": int(HTTP_TIMEOUT_SECONDS),
+                "prefer_grpc": False,  # force REST; gRPC port-binding fails on cloud
             }
             if self.api_key:
                 kwargs["api_key"] = self.api_key
