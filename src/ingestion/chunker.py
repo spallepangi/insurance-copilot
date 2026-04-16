@@ -15,6 +15,8 @@ logger = get_logger(__name__)
 # Approximate tokens per character for English (e.g. tiktoken-like)
 CHARS_PER_TOKEN_APPROX = 4
 
+_SENTENCE_SPLIT_RE = re.compile(r'(?<=[.!?])\s+')
+
 
 def _estimate_tokens(text: str) -> int:
     """Rough token count (words + punctuation)."""
@@ -25,7 +27,7 @@ def _estimate_tokens(text: str) -> int:
 
 def _split_into_sentences(text: str) -> list[str]:
     """Simple sentence split for overlap boundary."""
-    parts = re.split(r'(?<=[.!?])\s+', text)
+    parts = _SENTENCE_SPLIT_RE.split(text)
     return [p.strip() for p in parts if p.strip()]
 
 

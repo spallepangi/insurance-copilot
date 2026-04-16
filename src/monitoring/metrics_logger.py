@@ -3,8 +3,9 @@ Log query metrics (latency, tokens, cost) to local JSON/SQLite for observability
 """
 
 import json
+import sqlite3
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from src.utils.config import LOGS_DIR
 from src.utils.logger import get_logger
@@ -14,17 +15,55 @@ logger = get_logger(__name__)
 METRICS_FILE = LOGS_DIR / "query_metrics.jsonl"
 SQLITE_DB = LOGS_DIR / "metrics.db"
 
+_CREATE_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS query_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    query TEXT,
+    latency_ms REAL,
+    retrieval_latency_ms REAL,
+    generation_latency_ms REAL,
+    prompt_tokens INTEGER,
+    completion_tokens INTEGER,
+    cost REAL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+"""
+
+_INSERT_SQL = """
+INSERT INTO query_metrics
+(query, latency_ms, retrieval_latency_ms, generation_latency_ms, prompt_tokens, completion_tokens, cost)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+"""
+
 
 class MetricsLogger:
-    """Append each query's metrics to a JSONL file and optionally SQLite."""
+    """Append each query's metrics to a JSONL file and optionally SQLite.
+
+    SQLite connection is kept alive for the lifetime of this instance to avoid
+    per-query open/close overhead. The schema is created once on first write.
+    """
 
     def __init__(self, jsonl_path: Path | None = None, use_sqlite: bool = True):
         self.jsonl_path = jsonl_path or METRICS_FILE
         self.use_sqlite = use_sqlite
-        self._sqlite_conn = None
+        self._sqlite_conn: Optional[sqlite3.Connection] = None
+        self._table_ready: bool = False
 
     def _ensure_log_dir(self) -> None:
         self.jsonl_path.parent.mkdir(parents=True, exist_ok=True)
+
+    def _get_conn(self) -> sqlite3.Connection:
+        """Return the persistent SQLite connection, creating it and the schema on first call."""
+        if self._sqlite_conn is None:
+            LOGS_DIR.mkdir(parents=True, exist_ok=True)
+            self._sqlite_conn = sqlite3.connect(str(SQLITE_DB), check_same_thread=False)
+            # WAL mode for better concurrent write performance
+            self._sqlite_conn.execute("PRAGMA journal_mode=WAL")
+        if not self._table_ready:
+            self._sqlite_conn.execute(_CREATE_TABLE_SQL)
+            self._sqlite_conn.commit()
+            self._table_ready = True
+        return self._sqlite_conn
 
     def log_query(
         self,
@@ -71,30 +110,9 @@ class MetricsLogger:
 
     def _write_sqlite(self, record: dict[str, Any]) -> None:
         try:
-            import sqlite3
-            LOGS_DIR.mkdir(parents=True, exist_ok=True)
-            conn = sqlite3.connect(str(SQLITE_DB))
+            conn = self._get_conn()
             conn.execute(
-                """
-                CREATE TABLE IF NOT EXISTS query_metrics (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    query TEXT,
-                    latency_ms REAL,
-                    retrieval_latency_ms REAL,
-                    generation_latency_ms REAL,
-                    prompt_tokens INTEGER,
-                    completion_tokens INTEGER,
-                    cost REAL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-            conn.execute(
-                """
-                INSERT INTO query_metrics
-                (query, latency_ms, retrieval_latency_ms, generation_latency_ms, prompt_tokens, completion_tokens, cost)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
+                _INSERT_SQL,
                 (
                     record.get("query", ""),
                     record.get("latency_ms", 0),
@@ -106,6 +124,5 @@ class MetricsLogger:
                 ),
             )
             conn.commit()
-            conn.close()
         except Exception as e:
             logger.debug("SQLite metrics write failed: %s", e)

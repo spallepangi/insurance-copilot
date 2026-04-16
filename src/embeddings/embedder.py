@@ -43,8 +43,8 @@ class BGEEmbedder:
         model = self._get_model()
         # bge recommends prefix "Represent this sentence for searching: " for retrieval
         prefixed = f"Represent this sentence for searching relevant passages: {query}"
-        vec = model.encode([prefixed], normalize_embeddings=True)
-        return vec[0].tolist()
+        vec = model.encode(prefixed, normalize_embeddings=True)
+        return vec.tolist()
 
     @property
     def dimension(self) -> int:

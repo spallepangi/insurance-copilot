@@ -1,0 +1,11 @@
+# Ingestion-only dependencies (PDF parsing).
+# Install in addition to requirements.txt when running scripts/ingest_documents.py
+-r requirements.txt
+
+docling>=2.0.0
+llama-index>=0.10.0
+llama-index-embeddings-huggingface>=0.1.0
+llama-index-vector-stores-qdrant>=0.2.0
+llama-index-llms-openai>=0.1.0
+langsmith>=0.1.0
+structlog>=24.1.0

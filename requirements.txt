@@ -1,12 +1,10 @@
-# InsuranceCopilot AI - Dependencies
+# InsuranceCopilot AI - Runtime dependencies (Streamlit app + FastAPI)
+# For ingestion (PDF parsing), also install: requirements-ingestion.txt
 
 # Core
 python-dotenv>=1.0.0
 pydantic>=2.0.0
 tqdm>=4.66.0
-
-# PDF parsing
-docling>=2.0.0
 
 # Embeddings & ML
 sentence-transformers>=2.2.0
@@ -15,11 +13,7 @@ FlagEmbedding>=1.2.0
 # Vector store
 qdrant-client>=1.7.0
 
-# RAG & LLM
-llama-index>=0.10.0
-llama-index-embeddings-huggingface>=0.1.0
-llama-index-vector-stores-qdrant>=0.2.0
-llama-index-llms-openai>=0.1.0
+# LLM
 openai>=1.0.0
 
 # API & UI
@@ -29,8 +23,6 @@ streamlit>=1.29.0
 slowapi>=0.1.9
 
 # Monitoring
-langsmith>=0.1.0
-structlog>=24.1.0
 tenacity>=8.2.0
 
 # BM25 keyword retrieval
@@ -41,5 +33,5 @@ pytest>=7.4.0
 pytest-cov>=4.1.0
 httpx>=0.27.0
 
-# Evaluation & utils (numpy<2 for docling/pandas/sentence-transformers compatibility)
+# Compatibility
 numpy>=1.24.0,<2.0

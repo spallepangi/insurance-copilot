@@ -10,13 +10,15 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+_SENTENCE_SPLIT_RE = re.compile(r'(?<=[.!?])\s+')
+
 
 def _sentences_from_text(text: str) -> List[str]:
     """Split text into sentences (period, question mark, exclamation). Trim whitespace."""
     if not (text or "").strip():
         return []
     # Split on sentence boundaries, keep delimiters for reconstruction
-    parts = re.split(r'(?<=[.!?])\s+', text.strip())
+    parts = _SENTENCE_SPLIT_RE.split(text.strip())
     return [p.strip() for p in parts if p.strip()]
 
 

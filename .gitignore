@@ -41,3 +41,6 @@ logs/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Streamlit secrets (never commit — add via Streamlit Cloud UI)
+.streamlit/secrets.toml

@@ -94,9 +94,10 @@ class AnswerGenerator:
         )
         choice = resp.choices[0] if resp.choices else None
         answer = choice.message.content if choice else ""
+        _usage = getattr(resp, "usage", None)
         usage = {
-            "prompt_tokens": getattr(resp, "usage", None) and resp.usage.prompt_tokens or 0,
-            "completion_tokens": getattr(resp, "usage", None) and resp.usage.completion_tokens or 0,
+            "prompt_tokens": _usage.prompt_tokens if _usage else 0,
+            "completion_tokens": _usage.completion_tokens if _usage else 0,
         }
         citations = _format_citations(chunks)
         return {

@@ -46,11 +46,16 @@ class QdrantStore:
         self.collection_name = collection_name
         self.vector_size = vector_size
         self._client: Optional[QdrantClient] = None
+        self._plan_index_ensured: bool = False
 
     @property
     def client(self) -> QdrantClient:
         if self._client is None:
-            kwargs: dict = {"url": self.url, "timeout": int(HTTP_TIMEOUT_SECONDS)}
+            kwargs: dict = {
+                "url": self.url,
+                "timeout": int(HTTP_TIMEOUT_SECONDS),
+                "check_compatibility": False,
+            }
             if self.api_key:
                 kwargs["api_key"] = self.api_key
             self._client = QdrantClient(**kwargs)
@@ -70,8 +75,8 @@ class QdrantStore:
             except Exception:
                 pass
             exists = False
-        if not exists or recreate:
-            self.client.recreate_collection(
+        if not exists:
+            self.client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=qmodels.VectorParams(
                     size=self.vector_size,
@@ -81,11 +86,14 @@ class QdrantStore:
                     indexing_threshold=10000,
                 ),
             )
-            logger.info("Collection %s ready", self.collection_name)
+            logger.info("Collection %s created", self.collection_name)
         self._ensure_plan_index()
 
     def _ensure_plan_index(self):
-        """Create payload index on 'plan' so filter by plan works. Idempotent (ignores if exists)."""
+        """Create payload index on 'plan' so filter by plan works. Idempotent (ignores if exists).
+        Cached per-instance: only calls Qdrant once per QdrantStore lifetime."""
+        if self._plan_index_ensured:
+            return
         try:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
@@ -99,6 +107,7 @@ class QdrantStore:
                 pass
             else:
                 logger.warning("Could not create payload index for 'plan': %s", e)
+        self._plan_index_ensured = True
 
     def collection_exists(self) -> bool:
         try:

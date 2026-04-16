@@ -11,13 +11,14 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+_TOKEN_RE = re.compile(r"[a-z0-9]{2,}")
+
 
 def _tokenize(text: str) -> List[str]:
     """Simple tokenizer: lowercase, split on non-alphanumeric, keep words 2+ chars."""
     if not text:
         return []
-    tokens = re.findall(r"[a-z0-9]{2,}", text.lower())
-    return tokens
+    return _TOKEN_RE.findall(text.lower())
 
 
 def build_and_save(

@@ -47,16 +47,6 @@ class IndexBuilder:
             })
 
         self.vector_store.ensure_collection(recreate=False)
-        if not self.vector_store.collection_exists():
-            self.vector_store.ensure_collection(recreate=True)
-
-        # Ensure collection has correct vector size
-        try:
-            coll = self.vector_store.client.get_collection(self.vector_store.collection_name)
-            if coll.config.params.vectors.size != self.embedder.dimension:
-                self.vector_store.ensure_collection(recreate=True)
-        except Exception:
-            self.vector_store.ensure_collection(recreate=True)
 
         ids = [str(uuid4()) for _ in chunks]
         for i in range(0, len(texts), batch_size):

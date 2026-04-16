@@ -15,6 +15,8 @@ MAX_SAMPLES = 10_000
 _latencies: Deque[float] = deque(maxlen=MAX_SAMPLES)
 # Last stage timings for inspection (retrieval_ms, rerank_ms, compression_ms, generation_ms, total_ms)
 _last_stage_timings: Optional[dict[str, float]] = None
+# Cached sorted snapshot — invalidated whenever a new sample is recorded
+_stats_cache: Optional[dict] = None
 
 
 class LatencyTracker:
@@ -22,15 +24,20 @@ class LatencyTracker:
 
     @classmethod
     def record(cls, latency_ms: float, stage_timings: Optional[dict[str, float]] = None) -> None:
-        global _last_stage_timings
+        global _last_stage_timings, _stats_cache
         _latencies.append(latency_ms)
+        _stats_cache = None  # invalidate cache on new sample
         if stage_timings is not None:
             _last_stage_timings = stage_timings
 
     @classmethod
     def get_stats(cls) -> dict:
-        """Return p50, p95, p99, count, mean; and last stage timings if available."""
-        out = {}
+        """Return p50, p95, p99, count, mean; and last stage timings if available.
+        Result is cached between calls and invalidated whenever a new sample is recorded."""
+        global _stats_cache
+        if _stats_cache is not None:
+            return _stats_cache
+        out: dict = {}
         if not _latencies:
             out = {
                 "count": 0,
@@ -40,8 +47,7 @@ class LatencyTracker:
                 "mean_ms": None,
             }
         else:
-            data = list(_latencies)
-            data.sort()
+            data = sorted(_latencies)
             n = len(data)
             out = {
                 "count": n,
@@ -52,13 +58,15 @@ class LatencyTracker:
             }
         if _last_stage_timings:
             out["last_stage_timings_ms"] = {k: round(v, 2) for k, v in _last_stage_timings.items()}
+        _stats_cache = out
         return out
 
     @classmethod
     def reset(cls) -> None:
-        global _last_stage_timings
+        global _last_stage_timings, _stats_cache
         _latencies.clear()
         _last_stage_timings = None
+        _stats_cache = None
 
 
 def _percentile(sorted_data: list[float], p: float) -> float:

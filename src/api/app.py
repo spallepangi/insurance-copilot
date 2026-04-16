@@ -20,8 +20,9 @@ from src.vector_store.qdrant_client import QdrantStore
 
 logger = get_logger(__name__)
 
-# Global pipeline (lazy init to avoid loading keys at import)
+# Global singletons (lazy init to avoid loading keys at import)
 _pipeline: RAGPipeline | None = None
+_qdrant_store: QdrantStore | None = None
 _shutting_down: bool = False
 
 
@@ -32,11 +33,17 @@ def get_pipeline() -> RAGPipeline:
     return _pipeline
 
 
+def _get_qdrant_store() -> QdrantStore:
+    global _qdrant_store
+    if _qdrant_store is None:
+        _qdrant_store = QdrantStore()
+    return _qdrant_store
+
+
 def _check_qdrant() -> bool:
     """Return True if Qdrant is reachable and collection exists."""
     try:
-        store = QdrantStore()
-        return store.collection_exists()
+        return _get_qdrant_store().collection_exists()
     except Exception:
         return False
 
