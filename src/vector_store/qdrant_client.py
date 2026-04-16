@@ -54,7 +54,6 @@ class QdrantStore:
             kwargs: dict = {
                 "url": self.url,
                 "timeout": int(HTTP_TIMEOUT_SECONDS),
-                "check_compatibility": False,
             }
             if self.api_key:
                 kwargs["api_key"] = self.api_key

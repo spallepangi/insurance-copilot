@@ -11,7 +11,7 @@ sentence-transformers>=2.2.0
 FlagEmbedding>=1.2.0
 
 # Vector store
-qdrant-client>=1.7.0
+qdrant-client>=1.9.0
 
 # LLM
 openai>=1.0.0
