@@ -2,6 +2,15 @@
 Streamlit UI: search bar, plan comparison, answer display with citations, metrics dashboard.
 """
 
+import sys
+from pathlib import Path
+
+# Ensure repo root is on sys.path so `src.*` imports resolve on Streamlit Cloud
+# (Streamlit adds the file's directory to sys.path, not the repo root)
+_repo_root = str(Path(__file__).resolve().parents[2])
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
+
 import streamlit as st
 from src.rag.rag_pipeline import RAGPipeline
 from src.monitoring.latency_tracker import LatencyTracker
